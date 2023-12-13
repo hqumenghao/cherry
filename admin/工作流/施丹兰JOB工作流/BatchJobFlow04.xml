@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?> <!DOCTYPE workflow PUBLIC "-//OpenSymphony Group//DTD OSWorkflow 2.8//EN"
+        "http://www.opensymphony.com/osworkflow/workflow_2_8.dtd">
+<workflow>
+    <registers>
+        <register type="class" variable-name="logger">
+            <arg name="class.name">com.cherry.cm.core.CherryFlowLogRegister</arg>
+            <arg name="addInstanceId">true</arg>
+        </register>
+    </registers>
+    <initial-actions>
+        <action id="1000" name="开始">
+            <pre-functions>
+                <function type="beanshell">
+                    <arg name="script">
+                        <![CDATA[              batchDate = new Date();                       transientVars.get("logger").info("###########################实时库存导出JOB于"+batchDate+"开始#####################################");     ]]>      </arg>
+                </function>
+                <function type="class">
+                    <arg name="class.name">com.opensymphony.workflow.util.Caller</arg>
+                </function>
+            </pre-functions>
+            <results>
+                <unconditional-result old-status="Finished" status="FinishCherry" step="900" owner="${caller}"/>
+            </results>
+        </action>
+    </initial-actions>
+    <steps>
+        <step id="900" name="CherryBatch工作流程结束处理">
+            <actions>
+                <action id="901" name="结束CherryBatch工作流程">
+                    <restrict-to>
+                        <conditions type="AND">
+                            <condition type="class">
+                                <arg name="status">FinishCherry</arg>
+                                <arg name="class.name">com.opensymphony.workflow.util.StatusCondition</arg>
+                            </condition>
+                        </conditions>
+                    </restrict-to>
+                    <pre-functions>
+                        <function type="beanshell">
+                            <arg name="script">
+                                <![CDATA[              batchDate = new Date();                       transientVars.get("logger").info("###########################实时库存导出JOB于"+batchDate+"结束#####################################");     ]]>        </arg>
+                        </function>
+                    </pre-functions>
+                    <results>
+                        <unconditional-result old-status="Finished" status="Finished" step="999"/>
+                    </results>
+                </action>
+            </actions>
+        </step>
+        <step id="999" name="流程结束"></step>
+    </steps>
+</workflow> 
