@@ -19,11 +19,673 @@
                 </function>
             </pre-functions>
             <results>
-                <unconditional-result old-status="Finished" status="FinishCherry" step="900" owner="${caller}"/>
+                <unconditional-result old-status="Finished" status="Queued" step="16" owner="${caller}"/>
             </results>
         </action>
     </initial-actions>
     <steps>
+        <step id="16" name="接口数据库同步">              <!-- 2018-05-29新增cedric-->
+            <actions>
+                <action id="161" name="销售数据导出(标准接口)">
+                    <restrict-to>
+                        <conditions type="AND">
+                            <condition type="class">
+                                <arg name="status">Queued</arg>
+                                <arg name="class.name">com.opensymphony.workflow.util.StatusCondition</arg>
+                            </condition>
+                        </conditions>
+                    </restrict-to>
+                    <pre-functions>
+                        <function type="spring">
+                            <arg name="bean.name">saleInfo_FN</arg>
+                        </function>
+                    </pre-functions>
+                    <results>                          <!-- 出错时停留在本步骤 -->
+                        <result old-status="Finished" status="ErrEnded" step="16">
+                            <conditions type="AND">
+                                <condition type="class">
+                                    <arg name="class.name">com.cherry.cm.core.CherryResultCondition</arg>
+                                    <arg name="Cherry_status">-1</arg>
+                                </condition>
+                            </conditions>
+                        </result>                          <!-- 执行成功跳转到下个动作 -->
+                        <unconditional-result old-status="Finished" status="Queued01" step="16"/>
+                    </results>                      <!-- 输出本次动作执行的结果 -->
+                    <post-functions>
+                        <function type="class">
+                            <arg name="class.name">com.cherry.cm.core.CherryFlowResultLog</arg>
+                        </function>
+                    </post-functions>
+                </action>
+                <action id="162" name="部门信息导出(标准接口)">
+                    <restrict-to>
+                        <conditions type="AND">
+                            <condition type="class">
+                                <arg name="status">Queued01</arg>
+                                <arg name="class.name">com.opensymphony.workflow.util.StatusCondition</arg>
+                            </condition>
+                        </conditions>
+                    </restrict-to>
+                    <pre-functions>
+                        <function type="spring">
+                            <arg name="bean.name">binBAT272_FN</arg>
+                        </function>
+                    </pre-functions>
+                    <results>                          <!-- 出错时停留在本步骤 -->
+                        <result old-status="Finished" status="ErrEnded" step="16">
+                            <conditions type="AND">
+                                <condition type="class">
+                                    <arg name="class.name">com.cherry.cm.core.CherryResultCondition</arg>
+                                    <arg name="Cherry_status">-1</arg>
+                                </condition>
+                            </conditions>
+                        </result>                          <!-- 执行成功跳转到下个动作 -->
+                        <unconditional-result old-status="Finished" status="BAT132" step="16"/>
+                    </results>                      <!-- 输出本次动作执行的结果 -->
+                    <post-functions>
+                        <function type="class">
+                            <arg name="class.name">com.cherry.cm.core.CherryFlowResultLog</arg>
+                        </function>
+                    </post-functions>
+                </action>
+                <action id="164" name="订单导出(标准接口)">
+                    <restrict-to>
+                        <conditions type="AND">
+                            <condition type="class">
+                                <arg name="status">BAT132</arg>
+                                <arg name="class.name">com.opensymphony.workflow.util.StatusCondition</arg>
+                            </condition>
+                        </conditions>
+                    </restrict-to>
+                    <pre-functions>
+                        <function type="spring">
+                            <arg name="bean.name">binBAT132_FN</arg>
+                        </function>
+                    </pre-functions>
+                    <results>                          <!-- 出错时停留在本步骤 -->
+                        <result old-status="Finished" status="ErrEnded" step="16">
+                            <conditions type="AND">
+                                <condition type="class">
+                                    <arg name="class.name">com.cherry.cm.core.CherryResultCondition</arg>
+                                    <arg name="Cherry_status">-1</arg>
+                                </condition>
+                            </conditions>
+                        </result>                          <!-- 执行成功跳转到下个动作 -->
+                        <unconditional-result old-status="Finished" status="Queued04" step="16"/>
+                    </results>                      <!-- 输出本次动作执行的结果 -->
+                    <post-functions>
+                        <function type="class">
+                            <arg name="class.name">com.cherry.cm.core.CherryFlowResultLog</arg>
+                        </function>
+                    </post-functions>
+                </action>
+                <action id="165" name="柜台盘点单据导出(标准接口)">
+                    <restrict-to>
+                        <conditions type="AND">
+                            <condition type="class">
+                                <arg name="status">Queued04</arg>
+                                <arg name="class.name">com.opensymphony.workflow.util.StatusCondition</arg>
+                            </condition>
+                        </conditions>
+                    </restrict-to>
+                    <pre-functions>
+                        <function type="spring">
+                            <arg name="bean.name">binBAT124_FN</arg>
+                        </function>
+                    </pre-functions>
+                    <results>                          <!-- 出错时停留在本步骤 -->
+                        <result old-status="Finished" status="ErrEnded" step="16">
+                            <conditions type="AND">
+                                <condition type="class">
+                                    <arg name="class.name">com.cherry.cm.core.CherryResultCondition</arg>
+                                    <arg name="Cherry_status">-1</arg>
+                                </condition>
+                            </conditions>
+                        </result>                          <!-- 执行成功跳转到下个动作 -->
+                        <unconditional-result old-status="Finished" status="Queued05" step="16"/>
+                    </results>                      <!-- 输出本次动作执行的结果 -->
+                    <post-functions>
+                        <function type="class">
+                            <arg name="class.name">com.cherry.cm.core.CherryFlowResultLog</arg>
+                        </function>
+                    </post-functions>
+                </action>
+                <action id="166" name="发货单导入(标准接口)">
+                    <restrict-to>
+                        <conditions type="AND">
+                            <condition type="class">
+                                <arg name="status">Queued05</arg>
+                                <arg name="class.name">com.opensymphony.workflow.util.StatusCondition</arg>
+                            </condition>
+                        </conditions>
+                    </restrict-to>
+                    <pre-functions>
+                        <function type="spring">
+                            <arg name="bean.name">binBAT134_FN</arg>
+                        </function>
+                    </pre-functions>
+                    <results>                          <!-- 出错时停留在本步骤 -->
+                        <result old-status="Finished" status="ErrEnded" step="16">
+                            <conditions type="AND">
+                                <condition type="class">
+                                    <arg name="class.name">com.cherry.cm.core.CherryResultCondition</arg>
+                                    <arg name="Cherry_status">-1</arg>
+                                </condition>
+                            </conditions>
+                        </result>                          <!-- 执行成功跳转到下个动作 -->
+                        <unconditional-result old-status="Finished" status="Queued06" step="16"/>
+                    </results>                      <!-- 输出本次动作执行的结果 -->
+                    <post-functions>
+                        <function type="class">
+                            <arg name="class.name">com.cherry.cm.core.CherryFlowResultLog</arg>
+                        </function>
+                    </post-functions>
+                </action>
+                <action id="167" name=" 退库单导入(标准接口)">
+                    <restrict-to>
+                        <conditions type="AND">
+                            <condition type="class">
+                                <arg name="status">Queued06</arg>
+                                <arg name="class.name">com.opensymphony.workflow.util.StatusCondition</arg>
+                            </condition>
+                        </conditions>
+                    </restrict-to>
+                    <pre-functions>
+                        <function type="spring">
+                            <arg name="bean.name">binBAT135_FN</arg>
+                        </function>
+                    </pre-functions>
+                    <results>                          <!-- 出错时停留在本步骤 -->
+                        <result old-status="Finished" status="ErrEnded" step="16">
+                            <conditions type="AND">
+                                <condition type="class">
+                                    <arg name="class.name">com.cherry.cm.core.CherryResultCondition</arg>
+                                    <arg name="Cherry_status">-1</arg>
+                                </condition>
+                            </conditions>
+                        </result>                          <!-- 执行成功跳转到下个动作 -->
+                        <unconditional-result old-status="Finished" status="Queued07" step="16"/>
+                    </results>                      <!-- 输出本次动作执行的结果 -->
+                    <post-functions>
+                        <function type="class">
+                            <arg name="class.name">com.cherry.cm.core.CherryFlowResultLog</arg>
+                        </function>
+                    </post-functions>
+                </action>
+                <action id="168" name=" 柜台调拨单据导出(标准接口)">
+                    <restrict-to>
+                        <conditions type="AND">
+                            <condition type="class">
+                                <arg name="status">Queued07</arg>
+                                <arg name="class.name">com.opensymphony.workflow.util.StatusCondition</arg>
+                            </condition>
+                        </conditions>
+                    </restrict-to>
+                    <pre-functions>
+                        <function type="spring">
+                            <arg name="bean.name">binbat125_FN</arg>
+                        </function>
+                    </pre-functions>
+                    <results>                          <!-- 出错时停留在本步骤 -->
+                        <result old-status="Finished" status="ErrEnded" step="16">
+                            <conditions type="AND">
+                                <condition type="class">
+                                    <arg name="class.name">com.cherry.cm.core.CherryResultCondition</arg>
+                                    <arg name="Cherry_status">-1</arg>
+                                </condition>
+                            </conditions>
+                        </result>                          <!-- 执行成功跳转到下个动作 -->
+                        <unconditional-result old-status="Finished" status="Queued08" step="16"/>
+                    </results>                      <!-- 输出本次动作执行的结果 -->
+                    <post-functions>
+                        <function type="class">
+                            <arg name="class.name">com.cherry.cm.core.CherryFlowResultLog</arg>
+                        </function>
+                    </post-functions>
+                </action>
+                <action id="169" name=" 柜台调拨单据导出(标准接口)">
+                    <restrict-to>
+                        <conditions type="AND">
+                            <condition type="class">
+                                <arg name="status">Queued08</arg>
+                                <arg name="class.name">com.opensymphony.workflow.util.StatusCondition</arg>
+                            </condition>
+                        </conditions>
+                    </restrict-to>
+                    <pre-functions>
+                        <function type="spring">
+                            <arg name="bean.name">binbat125_FN</arg>
+                        </function>
+                    </pre-functions>
+                    <results>                          <!-- 出错时停留在本步骤 -->
+                        <result old-status="Finished" status="ErrEnded" step="16">
+                            <conditions type="AND">
+                                <condition type="class">
+                                    <arg name="class.name">com.cherry.cm.core.CherryResultCondition</arg>
+                                    <arg name="Cherry_status">-1</arg>
+                                </condition>
+                            </conditions>
+                        </result>                          <!-- 执行成功跳转到下个动作 -->
+                        <unconditional-result old-status="Finished" status="Queued09" step="16"/>
+                    </results>                      <!-- 输出本次动作执行的结果 -->
+                    <post-functions>
+                        <function type="class">
+                            <arg name="class.name">com.cherry.cm.core.CherryFlowResultLog</arg>
+                        </function>
+                    </post-functions>
+                </action>
+                <action id="170" name=" 退库申请单导出(标准接口)">
+                    <restrict-to>
+                        <conditions type="AND">
+                            <condition type="class">
+                                <arg name="status">Queued09</arg>
+                                <arg name="class.name">com.opensymphony.workflow.util.StatusCondition</arg>
+                            </condition>
+                        </conditions>
+                    </restrict-to>
+                    <pre-functions>
+                        <function type="spring">
+                            <arg name="bean.name">binbat133_FN</arg>
+                        </function>
+                    </pre-functions>
+                    <results>                          <!-- 出错时停留在本步骤 -->
+                        <result old-status="Finished" status="ErrEnded" step="16">
+                            <conditions type="AND">
+                                <condition type="class">
+                                    <arg name="class.name">com.cherry.cm.core.CherryResultCondition</arg>
+                                    <arg name="Cherry_status">-1</arg>
+                                </condition>
+                            </conditions>
+                        </result>                          <!-- 执行成功跳转到下个动作 -->
+                        <unconditional-result old-status="Finished" status="Queued10" step="16"/>
+                    </results>                      <!-- 输出本次动作执行的结果 -->
+                    <post-functions>
+                        <function type="class">
+                            <arg name="class.name">com.cherry.cm.core.CherryFlowResultLog</arg>
+                        </function>
+                    </post-functions>
+                </action>
+                <action id="171" name=" 盘点申请单据导出(标准接口)">
+                    <restrict-to>
+                        <conditions type="AND">
+                            <condition type="class">
+                                <arg name="status">Queued10</arg>
+                                <arg name="class.name">com.opensymphony.workflow.util.StatusCondition</arg>
+                            </condition>
+                        </conditions>
+                    </restrict-to>
+                    <pre-functions>
+                        <function type="spring">
+                            <arg name="bean.name">binBAT157_FN</arg>
+                        </function>
+                    </pre-functions>
+                    <results>                          <!-- 出错时停留在本步骤 -->
+                        <result old-status="Finished" status="ErrEnded" step="16">
+                            <conditions type="AND">
+                                <condition type="class">
+                                    <arg name="class.name">com.cherry.cm.core.CherryResultCondition</arg>
+                                    <arg name="Cherry_status">-1</arg>
+                                </condition>
+                            </conditions>
+                        </result>                          <!-- 执行成功跳转到下个动作 -->
+                        <unconditional-result old-status="Finished" status="Queued11" step="16"/>
+                    </results>                      <!-- 输出本次动作执行的结果 -->
+                    <post-functions>
+                        <function type="class">
+                            <arg name="class.name">com.cherry.cm.core.CherryFlowResultLog</arg>
+                        </function>
+                    </post-functions>
+                </action>
+                <action id="172" name="盘点审核单据导入(标准接口)">
+                    <restrict-to>
+                        <conditions type="AND">
+                            <condition type="class">
+                                <arg name="status">Queued11</arg>
+                                <arg name="class.name">com.opensymphony.workflow.util.StatusCondition</arg>
+                            </condition>
+                        </conditions>
+                    </restrict-to>
+                    <pre-functions>
+                        <function type="spring">
+                            <arg name="bean.name">binBAT158_FN</arg>
+                        </function>
+                    </pre-functions>
+                    <results>                          <!-- 出错时停留在本步骤 -->
+                        <result old-status="Finished" status="ErrEnded" step="16">
+                            <conditions type="AND">
+                                <condition type="class">
+                                    <arg name="class.name">com.cherry.cm.core.CherryResultCondition</arg>
+                                    <arg name="Cherry_status">-1</arg>
+                                </condition>
+                            </conditions>
+                        </result>                          <!-- 执行成功跳转到下个动作 -->
+                        <unconditional-result old-status="Finished" status="Queued12" step="16"/>
+                    </results>                      <!-- 输出本次动作执行的结果 -->
+                    <post-functions>
+                        <function type="class">
+                            <arg name="class.name">com.cherry.cm.core.CherryFlowResultLog</arg>
+                        </function>
+                    </post-functions>
+                </action>
+                <action id="173" name=" 其它出库申请单导出(标准接口)">
+                    <restrict-to>
+                        <conditions type="AND">
+                            <condition type="class">
+                                <arg name="status">Queued12</arg>
+                                <arg name="class.name">com.opensymphony.workflow.util.StatusCondition</arg>
+                            </condition>
+                        </conditions>
+                    </restrict-to>
+                    <pre-functions>
+                        <function type="spring">
+                            <arg name="bean.name">binBAT194_FN</arg>
+                        </function>
+                    </pre-functions>
+                    <results>                          <!-- 出错时停留在本步骤 -->
+                        <result old-status="Finished" status="ErrEnded" step="16">
+                            <conditions type="AND">
+                                <condition type="class">
+                                    <arg name="class.name">com.cherry.cm.core.CherryResultCondition</arg>
+                                    <arg name="Cherry_status">-1</arg>
+                                </condition>
+                            </conditions>
+                        </result>                          <!-- 执行成功跳转到下个动作 -->
+                        <unconditional-result old-status="Finished" status="Queued13" step="16"/>
+                    </results>                      <!-- 输出本次动作执行的结果 -->
+                    <post-functions>
+                        <function type="class">
+                            <arg name="class.name">com.cherry.cm.core.CherryFlowResultLog</arg>
+                        </function>
+                    </post-functions>
+                </action>
+                <action id="174" name=" 其它出库审核单导入(标准接口)">
+                    <restrict-to>
+                        <conditions type="AND">
+                            <condition type="class">
+                                <arg name="status">Queued13</arg>
+                                <arg name="class.name">com.opensymphony.workflow.util.StatusCondition</arg>
+                            </condition>
+                        </conditions>
+                    </restrict-to>
+                    <pre-functions>
+                        <function type="spring">
+                            <arg name="bean.name">binBAT195_FN</arg>
+                        </function>
+                    </pre-functions>
+                    <results>                          <!-- 出错时停留在本步骤 -->
+                        <result old-status="Finished" status="ErrEnded" step="16">
+                            <conditions type="AND">
+                                <condition type="class">
+                                    <arg name="class.name">com.cherry.cm.core.CherryResultCondition</arg>
+                                    <arg name="Cherry_status">-1</arg>
+                                </condition>
+                            </conditions>
+                        </result>                          <!-- 执行成功跳转到下个动作 -->
+                        <unconditional-result old-status="Finished" status="BAT193" step="16"/>
+                    </results>                      <!-- 输出本次动作执行的结果 -->
+                    <post-functions>
+                        <function type="class">
+                            <arg name="class.name">com.cherry.cm.core.CherryFlowResultLog</arg>
+                        </function>
+                    </post-functions>
+                </action>
+                <action id="175" name=" 其它出库数据导出(标准接口)">
+                    <restrict-to>
+                        <conditions type="AND">
+                            <condition type="class">
+                                <arg name="status">BAT193</arg>
+                                <arg name="class.name">com.opensymphony.workflow.util.StatusCondition</arg>
+                            </condition>
+                        </conditions>
+                    </restrict-to>
+                    <pre-functions>
+                        <function type="spring">
+                            <arg name="bean.name">binBAT193_FN</arg>
+                        </function>
+                    </pre-functions>
+                    <results>                          <!-- 出错时停留在本步骤 -->
+                        <result old-status="Finished" status="ErrEnded" step="16">
+                            <conditions type="AND">
+                                <condition type="class">
+                                    <arg name="class.name">com.cherry.cm.core.CherryResultCondition</arg>
+                                    <arg name="Cherry_status">-1</arg>
+                                </condition>
+                            </conditions>
+                        </result>                          <!-- 执行成功跳转到下个动作 -->
+                        <unconditional-result old-status="Finished" status="BAT146" step="16"/>
+                    </results>                      <!-- 输出本次动作执行的结果 -->
+                    <post-functions>
+                        <function type="class">
+                            <arg name="class.name">com.cherry.cm.core.CherryFlowResultLog</arg>
+                        </function>
+                    </post-functions>
+                </action>
+                <action id="176" name=" 收货单据导出(标准接口)">
+                    <restrict-to>
+                        <conditions type="AND">
+                            <condition type="class">
+                                <arg name="status">BAT146</arg>
+                                <arg name="class.name">com.opensymphony.workflow.util.StatusCondition</arg>
+                            </condition>
+                        </conditions>
+                    </restrict-to>
+                    <pre-functions>
+                        <function type="spring">
+                            <arg name="bean.name">binBAT146_FN</arg>
+                        </function>
+                    </pre-functions>
+                    <results>                          <!-- 出错时停留在本步骤 -->
+                        <result old-status="Finished" status="ErrEnded" step="16">
+                            <conditions type="AND">
+                                <condition type="class">
+                                    <arg name="class.name">com.cherry.cm.core.CherryResultCondition</arg>
+                                    <arg name="Cherry_status">-1</arg>
+                                </condition>
+                            </conditions>
+                        </result>                          <!-- 执行成功跳转到下个动作 -->
+                        <unconditional-result old-status="Finished" status="BAT119" step="16"/>
+                    </results>                      <!-- 输出本次动作执行的结果 -->
+                    <post-functions>
+                        <function type="class">
+                            <arg name="class.name">com.cherry.cm.core.CherryFlowResultLog</arg>
+                        </function>
+                    </post-functions>
+                </action>
+                <action id="177" name=" 产品信息导出(标准接口)">
+                    <restrict-to>
+                        <conditions type="AND">
+                            <condition type="class">
+                                <arg name="status">BAT119</arg>
+                                <arg name="class.name">com.opensymphony.workflow.util.StatusCondition</arg>
+                            </condition>
+                        </conditions>
+                    </restrict-to>
+                    <pre-functions>
+                        <function type="spring">
+                            <arg name="bean.name">binbat119_FN</arg>
+                        </function>
+                    </pre-functions>
+                    <results>                          <!-- 出错时停留在本步骤 -->
+                        <result old-status="Finished" status="ErrEnded" step="16">
+                            <conditions type="AND">
+                                <condition type="class">
+                                    <arg name="class.name">com.cherry.cm.core.CherryResultCondition</arg>
+                                    <arg name="Cherry_status">-1</arg>
+                                </condition>
+                            </conditions>
+                        </result>                          <!-- 执行成功跳转到下个动作 -->
+                        <unconditional-result old-status="Finished" status="BAT117" step="16"/>
+                    </results>                      <!-- 输出本次动作执行的结果 -->
+                    <post-functions>
+                        <function type="class">
+                            <arg name="class.name">com.cherry.cm.core.CherryFlowResultLog</arg>
+                        </function>
+                    </post-functions>
+                </action>
+                <action id="178" name="柜台信息导出(标准接口)">
+                    <restrict-to>
+                        <conditions type="AND">
+                            <condition type="class">
+                                <arg name="status">BAT117</arg>
+                                <arg name="class.name">com.opensymphony.workflow.util.StatusCondition</arg>
+                            </condition>
+                        </conditions>
+                    </restrict-to>
+                    <pre-functions>
+                        <function type="spring">
+                            <arg name="bean.name">binBAT117_FN</arg>
+                        </function>
+                    </pre-functions>
+                    <results>                          <!-- 出错时停留在本步骤 -->
+                        <result old-status="Finished" status="ErrEnded" step="16">
+                            <conditions type="AND">
+                                <condition type="class">
+                                    <arg name="class.name">com.cherry.cm.core.CherryResultCondition</arg>
+                                    <arg name="Cherry_status">-1</arg>
+                                </condition>
+                            </conditions>
+                        </result>                          <!-- 执行成功跳转到下个动作 -->
+                        <unconditional-result old-status="Finished" status="BAT191" step="19"/>
+                    </results>                      <!-- 输出本次动作执行的结果 -->
+                    <post-functions>
+                        <function type="class">
+                            <arg name="class.name">com.cherry.cm.core.CherryFlowResultLog</arg>
+                        </function>
+                    </post-functions>
+                </action>
+            </actions>
+        </step>
+        <step id="19" name="储值记录导出">
+            <actions>
+                <action id="191" name="储值记录导出(标准接口)">
+                    <restrict-to>
+                        <conditions type="AND">
+                            <condition type="class">
+                                <arg name="status">BAT191</arg>
+                                <arg name="class.name">com.opensymphony.workflow.util.StatusCondition</arg>
+                            </condition>
+                        </conditions>
+                    </restrict-to>
+                    <pre-functions>
+                        <function type="spring">
+                            <arg name="bean.name">binBAT191_FN</arg>
+                        </function>
+                    </pre-functions>
+                    <results>                          <!-- 导入出错时停留在本步骤 -->
+                        <result old-status="Finished" status="ErrEnded" step="19">
+                            <conditions type="AND">
+                                <condition type="class">
+                                    <arg name="class.name">com.cherry.cm.core.CherryResultCondition</arg>
+                                    <arg name="Cherry_status">-1</arg>
+                                </condition>
+                            </conditions>
+                        </result>
+                        <unconditional-result old-status="Finished" status="ProOutFinished" step="30"/>
+                    </results>
+                    <post-functions>
+                        <function type="class">
+                            <arg name="class.name">com.cherry.cm.core.CherryFlowResultLog</arg>
+                        </function>
+                    </post-functions>
+                </action>
+            </actions>
+        </step>
+        <step id="30" name="对接基础APP处理STEP">
+            <actions>
+                <action id="31" name="基础SPU产品对接新零售同步">
+                    <restrict-to>
+                        <conditions type="AND">
+                            <condition type="class">
+                                <arg name="status">ProOutFinished</arg>
+                                <arg name="class.name">com.opensymphony.workflow.util.StatusCondition</arg>
+                            </condition>
+                        </conditions>
+                    </restrict-to>
+                    <pre-functions>
+                        <function type="spring">
+                            <arg name="bean.name">binBAT357_FN</arg>
+                        </function>
+                    </pre-functions>
+                    <results>                          <!-- 导入出错时停留在本步骤 -->
+                        <result old-status="Finished" status="ErrEnded" step="30">
+                            <conditions type="AND">
+                                <condition type="class">
+                                    <arg name="class.name">com.cherry.cm.core.CherryResultCondition</arg>
+                                    <arg name="Cherry_status">-1</arg>
+                                </condition>
+                            </conditions>
+                        </result>                          <!-- 执行成功跳转到下个动作 -->
+                        <unconditional-result old-status="Finished" status="ProFinished" step="30"/>
+                    </results>                      <!-- 输出本次动作执行的结果 -->
+                    <post-functions>
+                        <function type="class">
+                            <arg name="class.name">com.cherry.cm.core.CherryFlowResultLog</arg>
+                        </function>
+                    </post-functions>
+                </action>
+                <action id="32" name="基础架构对接新零售同步">
+                    <restrict-to>
+                        <conditions type="AND">
+                            <condition type="class">
+                                <arg name="status">ProFinished</arg>
+                                <arg name="class.name">com.opensymphony.workflow.util.StatusCondition</arg>
+                            </condition>
+                        </conditions>
+                    </restrict-to>
+                    <pre-functions>
+                        <function type="spring">
+                            <arg name="bean.name">binBAT356_FN</arg>
+                        </function>
+                    </pre-functions>
+                    <results>                          <!-- 导入出错时停留在本步骤 -->
+                        <result old-status="Finished" status="ErrEnded" step="30">
+                            <conditions type="AND">
+                                <condition type="class">
+                                    <arg name="class.name">com.cherry.cm.core.CherryResultCondition</arg>
+                                    <arg name="Cherry_status">-1</arg>
+                                </condition>
+                            </conditions>
+                        </result>                          <!-- 执行成功跳转到下个动作 -->
+                        <unconditional-result old-status="Finished" status="CntFinished" step="30"/>
+                    </results>                      <!-- 输出本次动作执行的结果 -->
+                    <post-functions>
+                        <function type="class">
+                            <arg name="class.name">com.cherry.cm.core.CherryFlowResultLog</arg>
+                        </function>
+                    </post-functions>
+                </action>
+                <action id="33" name="基础人员对接新零售同步">
+                    <restrict-to>
+                        <conditions type="AND">
+                            <condition type="class">
+                                <arg name="status">CntFinished</arg>
+                                <arg name="class.name">com.opensymphony.workflow.util.StatusCondition</arg>
+                            </condition>
+                        </conditions>
+                    </restrict-to>
+                    <pre-functions>
+                        <function type="spring">
+                            <arg name="bean.name">binBAT355_FN</arg>
+                        </function>
+                    </pre-functions>
+                    <results>                          <!-- 导入出错时停留在本步骤 -->
+                        <result old-status="Finished" status="ErrEnded" step="30">
+                            <conditions type="AND">
+                                <condition type="class">
+                                    <arg name="class.name">com.cherry.cm.core.CherryResultCondition</arg>
+                                    <arg name="Cherry_status">-1</arg>
+                                </condition>
+                            </conditions>
+                        </result>
+                        <unconditional-result old-status="Finished" status="FinishCherry" step="900"/>
+                    <post-functions>
+                        <function type="class">
+                            <arg name="class.name">com.cherry.cm.core.CherryFlowResultLog</arg>
+                        </function>
+                    </post-functions>
+                </action>
+            </actions>
+        </step>
         <step id="900" name="定时JOB工作流程结束处理">
             <actions>
                 <action id="901" name="结束定时JOB工作流程">

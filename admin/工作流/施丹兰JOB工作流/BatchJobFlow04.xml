@@ -19,11 +19,46 @@
                 </function>
             </pre-functions>
             <results>
-                <unconditional-result old-status="Finished" status="FinishCherry" step="900" owner="${caller}"/>
+                <unconditional-result old-status="Finished" status="stockQueued" step="20" owner="${caller}"/>
             </results>
         </action>
     </initial-actions>
     <steps>
+        <step id="20" name="实时库存导出（标准接口）">
+            <actions>
+                <action id="211" name="实时库存导出（标准接口）">
+                    <restrict-to>
+                        <conditions type="AND">
+                            <condition type="class">
+                                <arg name="status">stockQueued</arg>
+                                <arg name="class.name">com.opensymphony.workflow.util.StatusCondition</arg>
+                            </condition>
+                        </conditions>
+                    </restrict-to>
+                    <pre-functions>
+                        <function type="spring">
+                            <arg name="bean.name">binBAT144_FN</arg>
+                        </function>
+                    </pre-functions>
+                    <results>
+                        <result old-status="Finished" status="ErrEnded" step="20">
+                            <conditions type="AND">
+                                <condition type="class">
+                                    <arg name="class.name">com.cherry.cm.core.CherryResultCondition</arg>
+                                    <arg name="Cherry_status">-1</arg>
+                                </condition>
+                            </conditions>
+                        </result>
+                        <unconditional-result old-status="Finished" status="FinishCherry" step="900"/>
+                    </results>
+                    <post-functions>
+                        <function type="class">
+                            <arg name="class.name">com.cherry.cm.core.CherryFlowResultLog</arg>
+                        </function>
+                    </post-functions>
+                </action>
+            </actions>
+        </step>
         <step id="900" name="CherryBatch工作流程结束处理">
             <actions>
                 <action id="901" name="结束CherryBatch工作流程">
