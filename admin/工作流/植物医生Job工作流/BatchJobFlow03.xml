@@ -1,0 +1,592 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE workflow PUBLIC "-//OpenSymphony Group//DTD OSWorkflow 2.8//EN" "http://www.opensymphony.com/osworkflow/workflow_2_8.dtd">
+<workflow>
+    <registers>
+        <register type="class" variable-name="logger">
+            <arg name="class.name">com.cherry.cm.core.CherryFlowLogRegister</arg>
+            <arg name="addInstanceId">true</arg>
+        </register>
+    </registers>
+    <initial-actions>
+        <action id="1000" name="开始">
+            <pre-functions>
+                <function type="beanshell">
+                    <arg name="script"><![CDATA[               batchDate = new Date();                        transientVars.get("logger").info("###########################更新业务日期处理JOB于"+batchDate+"开始处理#####################################");      ]]></arg>
+                </function>
+                <function type="class">
+                    <arg name="class.name">com.opensymphony.workflow.util.Caller</arg>
+                </function>
+            </pre-functions>
+            <results>
+                <unconditional-result old-status="Finished" status="Underway" step="50" owner="${caller}" />
+            </results>
+        </action>
+    </initial-actions>
+    <steps>
+        <step id="50" name="各种规则计算处理">
+            <actions>
+                <action id="52" name="降级处理">
+                    <restrict-to>
+                        <conditions type="AND">
+                            <condition type="class">
+                                <arg name="status">Underway</arg>
+                                <arg name="class.name">com.opensymphony.workflow.util.StatusCondition</arg>
+                            </condition>
+                        </conditions>
+                    </restrict-to>
+                    <pre-functions>
+                        <function type="spring">
+                            <arg name="bean.name">binBEDRHAN03_FN</arg>
+                        </function>
+                    </pre-functions>
+                    <results>                        <!-- 导入出错时停留在本步骤 -->
+                        <result old-status="Finished" status="ErrEnded" step="50">
+                            <conditions type="AND">
+                                <condition type="class">
+                                    <arg name="class.name">com.cherry.cm.core.CherryResultCondition</arg>
+                                    <arg name="Cherry_status">-1</arg>
+                                </condition>
+                            </conditions>
+                        </result>                        <!-- 执行成功跳转到下个动作 -->
+                        <unconditional-result old-status="Finished" status="CTCRQueued" step="50" />
+                    </results>                    <!-- 输出本次动作执行的结果 -->
+                    <post-functions>
+                        <function type="class">
+                            <arg name="class.name">com.cherry.cm.core.CherryFlowResultLog</arg>
+                        </function>
+                    </post-functions>
+                </action>
+                <action id="46" name="活动单据生成(翌日业务)">
+                    <restrict-to>
+                        <conditions type="AND">
+                            <condition type="class">
+                                <arg name="status">CTCRQueued</arg>
+                                <arg name="class.name">com.opensymphony.workflow.util.StatusCondition</arg>
+                            </condition>
+                        </conditions>
+                    </restrict-to>
+                    <pre-functions>
+                        <function type="spring">
+                            <arg name="bean.name">binCPMEACT04_FN</arg>
+                        </function>
+                    </pre-functions>
+                    <results>                        <!-- 导入出错时停留在本步骤 -->
+                        <result old-status="Finished" status="ErrEnded" step="50">
+                            <conditions type="AND">
+                                <condition type="class">
+                                    <arg name="class.name">com.cherry.cm.core.CherryResultCondition</arg>
+                                    <arg name="Cherry_status">-1</arg>
+                                </condition>
+                            </conditions>
+                        </result>                        <!-- 执行成功跳转到下个动作 -->
+                        <unconditional-result old-status="Finished" status="BussinessDate" step="60"/>
+                    </results>                    <!-- 输出本次动作执行的结果 -->
+                    <post-functions>
+                        <function type="class">
+                            <arg name="class.name">com.cherry.cm.core.CherryFlowResultLog</arg>
+                        </function>
+                    </post-functions>
+                </action>
+            </actions>
+        </step>
+        <step id="60" name="清空各种采番表处理">
+            <actions>
+                <action id="64" name="更新业务日期处理">
+                    <restrict-to>
+                        <conditions type="AND">
+                            <condition type="class">
+                                <arg name="status">BussinessDate</arg>
+                                <arg name="class.name">com.opensymphony.workflow.util.StatusCondition</arg>
+                            </condition>
+                        </conditions>
+                    </restrict-to>
+                    <pre-functions>
+                        <function type="spring">
+                            <arg name="bean.name">binBETLBAT04_FN</arg>
+                        </function>
+                    </pre-functions>
+                    <results>                        <!-- 导入出错时停留在本步骤 -->
+                        <result old-status="Finished" status="ErrEnded" step="60">
+                            <conditions type="AND">
+                                <condition type="class">
+                                    <arg name="class.name">com.cherry.cm.core.CherryResultCondition</arg>
+                                    <arg name="Cherry_status">-1</arg>
+                                </condition>
+                            </conditions>
+                        </result>                        <!-- 执行成功跳转到下个动作 -->
+                        <unconditional-result old-status="Finished" status="PREQueued" step="60" />
+                    </results>                    <!-- 输出本次动作执行的结果 -->
+                    <post-functions>
+                        <function type="class">
+                            <arg name="class.name">com.cherry.cm.core.CherryFlowResultLog</arg>
+                        </function>
+                    </post-functions>
+                </action>                <!-- 会员组添加的一个预售单积分计算处理的JOB,需要放在更新业务日期的后面 -->
+                <action id="641" name="预售单积分计算处理">
+                    <restrict-to>
+                        <conditions type="AND">
+                            <condition type="class">
+                                <arg name="status">PREQueued</arg>
+                                <arg name="class.name">com.opensymphony.workflow.util.StatusCondition</arg>
+                            </condition>
+                        </conditions>
+                    </restrict-to>
+                    <pre-functions>
+                        <function type="spring">
+                            <arg name="bean.name">binBEDRHAN13_FN</arg>
+                        </function>
+                    </pre-functions>
+                    <results>                        <!-- 导入出错时停留在本步骤 -->
+                        <result old-status="Finished" status="ErrEnded" step="60">
+                            <conditions type="AND">
+                                <condition type="class">
+                                    <arg name="class.name">com.cherry.cm.core.CherryResultCondition</arg>
+                                    <arg name="Cherry_status">-1</arg>
+                                </condition>
+                            </conditions>
+                        </result>                        <!-- 执行成功跳转到下个动作 -->
+                        <unconditional-result old-status="Finished" status="bhlda01" step="60" />
+                    </results>                    <!-- 输出本次动作执行的结果 -->
+                    <post-functions>
+                        <function type="class">
+                            <arg name="class.name">com.cherry.cm.core.CherryFlowResultLog</arg>
+                        </function>
+                    </post-functions>
+                </action>
+                <action id="642" name="更新护理档案中过期的下次护理时间">
+                    <restrict-to>
+                        <conditions type="AND">
+                            <condition type="class">
+                                <arg name="status">bhlda01</arg>
+                                <arg name="class.name">com.opensymphony.workflow.util.StatusCondition</arg>
+                            </condition>
+                        </conditions>
+                    </restrict-to>
+                    <pre-functions>
+                        <function type="spring">
+                            <arg name="bean.name">binbembhlda01_FN</arg>
+                        </function>
+                    </pre-functions>
+                    <results>                        <!-- 导入出错时停留在本步骤 -->
+                        <result old-status="Finished" status="ErrEnded" step="60">
+                            <conditions type="AND">
+                                <condition type="class">
+                                    <arg name="class.name">com.cherry.cm.core.CherryResultCondition</arg>
+                                    <arg name="Cherry_status">-1</arg>
+                                </condition>
+                            </conditions>
+                        </result>                        <!-- 执行成功跳转到下个动作 -->
+                        <unconditional-result old-status="Finished" status="PCQueued" step="60" />
+                    </results>                    <!-- 输出本次动作执行的结果 -->
+                    <post-functions>
+                        <function type="class">
+                            <arg name="class.name">com.cherry.cm.core.CherryFlowResultLog</arg>
+                        </function>
+                    </post-functions>
+                </action>
+                <action id="65" name="积分清零处理">
+                    <restrict-to>
+                        <conditions type="AND">
+                            <condition type="class">
+                                <arg name="status">PCQueued</arg>
+                                <arg name="class.name">com.opensymphony.workflow.util.StatusCondition</arg>
+                            </condition>
+                        </conditions>
+                    </restrict-to>
+                    <pre-functions>
+                        <function type="spring">
+                            <arg name="bean.name">binBEDRHAN04_FN</arg>
+                        </function>
+                    </pre-functions>
+                    <results>                        <!-- 导入出错时停留在本步骤 -->
+                        <result old-status="Finished" status="ErrEnded" step="60">
+                            <conditions type="AND">
+                                <condition type="class">
+                                    <arg name="class.name">com.cherry.cm.core.CherryResultCondition</arg>
+                                    <arg name="Cherry_status">-1</arg>
+                                </condition>
+                            </conditions>
+                        </result>                        <!-- 执行成功跳转到下个动作 -->
+                        <unconditional-result old-status="Finished" status="Queued" step="60" />
+                    </results>                    <!-- 输出本次动作执行的结果 -->
+                    <post-functions>
+                        <function type="class">
+                            <arg name="class.name">com.cherry.cm.core.CherryFlowResultLog</arg>
+                        </function>
+                    </post-functions>
+                </action>
+                <action id="61" name="清空采番表处理">
+                    <restrict-to>
+                        <conditions type="AND">
+                            <condition type="class">
+                                <arg name="status">Queued</arg>
+                                <arg name="class.name">com.opensymphony.workflow.util.StatusCondition</arg>
+                            </condition>
+                        </conditions>
+                    </restrict-to>
+                    <pre-functions>
+                        <function type="spring">
+                            <arg name="bean.name">binBETLBAT01_FN</arg>
+                        </function>
+                    </pre-functions>
+                    <results>                        <!-- 导入出错时停留在本步骤 -->
+                        <result old-status="Finished" status="ErrEnded" step="60">
+                            <conditions type="AND">
+                                <condition type="class">
+                                    <arg name="class.name">com.cherry.cm.core.CherryResultCondition</arg>
+                                    <arg name="Cherry_status">-1</arg>
+                                </condition>
+                            </conditions>
+                        </result>                        <!-- 执行成功跳转到下个动作 -->
+                        <unconditional-result old-status="Finished" status="Underway" step="60" />
+                    </results>                    <!-- 输出本次动作执行的结果 -->
+                    <post-functions>
+                        <function type="class">
+                            <arg name="class.name">com.cherry.cm.core.CherryFlowResultLog</arg>
+                        </function>
+                    </post-functions>
+                </action>
+                <action id="62" name="整理各种取号表处理">
+                    <restrict-to>
+                        <conditions type="AND">
+                            <condition type="class">
+                                <arg name="status">Underway</arg>
+                                <arg name="class.name">com.opensymphony.workflow.util.StatusCondition</arg>
+                            </condition>
+                        </conditions>
+                    </restrict-to>
+                    <pre-functions>
+                        <function type="spring">
+                            <arg name="bean.name">binBETLBAT02_FN</arg>
+                        </function>
+                    </pre-functions>
+                    <results>                        <!-- 导入出错时停留在本步骤 -->
+                        <result old-status="Finished" status="ErrEnded" step="60">
+                            <conditions type="AND">
+                                <condition type="class">
+                                    <arg name="class.name">com.cherry.cm.core.CherryResultCondition</arg>
+                                    <arg name="Cherry_status">-1</arg>
+                                </condition>
+                            </conditions>
+                        </result>                        <!-- 执行成功跳转到下个动作 -->
+                        <unconditional-result old-status="Finished" status="Inprogress" step="60" />
+                    </results>                    <!-- 输出本次动作执行的结果 -->
+                    <post-functions>
+                        <function type="class">
+                            <arg name="class.name">com.cherry.cm.core.CherryFlowResultLog</arg>
+                        </function>
+                    </post-functions>
+                </action>
+                <action id="63" name="清空OSWF序号表处理">
+                    <restrict-to>
+                        <conditions type="AND">
+                            <condition type="class">
+                                <arg name="status">Inprogress</arg>
+                                <arg name="class.name">com.opensymphony.workflow.util.StatusCondition</arg>
+                            </condition>
+                        </conditions>
+                    </restrict-to>
+                    <pre-functions>
+                        <function type="spring">
+                            <arg name="bean.name">binBETLBAT03_FN</arg>
+                        </function>
+                    </pre-functions>
+                    <results>                        <!-- 导入出错时停留在本步骤 -->
+                        <result old-status="Finished" status="ErrEnded" step="60">
+                            <conditions type="AND">
+                                <condition type="class">
+                                    <arg name="class.name">com.cherry.cm.core.CherryResultCondition</arg>
+                                    <arg name="Cherry_status">-1</arg>
+                                </condition>
+                            </conditions>
+                        </result>                        <!-- 执行成功跳转到下个动作 -->
+                        <unconditional-result old-status="Finished" status="385end" step="60" />
+                    </results>                    <!-- 输出本次动作执行的结果 -->
+                    <post-functions>
+                        <function type="class">
+                            <arg name="class.name">com.cherry.cm.core.CherryFlowResultLog</arg>
+                        </function>
+                    </post-functions>
+                </action>
+                <action id="66" name="预算积分额度报表">
+                    <restrict-to>
+                        <conditions type="AND">
+                            <condition type="class">
+                                <arg name="status">385end</arg>
+                                <arg name="class.name">com.opensymphony.workflow.util.StatusCondition</arg>
+                            </condition>
+                        </conditions>
+                    </restrict-to>
+                    <pre-functions>
+                        <function type="spring">
+                            <arg name="bean.name">pointLimitReport_FN</arg>
+                        </function>
+                    </pre-functions>
+                    <results>                        <!-- 导入出错时停留在本步骤 -->
+                        <result old-status="Finished" status="ErrEnded" step="60">
+                            <conditions type="AND">
+                                <condition type="class">
+                                    <arg name="class.name">com.cherry.cm.core.CherryResultCondition</arg>
+                                    <arg name="Cherry_status">-1</arg>
+                                </condition>
+                            </conditions>
+                        </result>                        <!-- 执行成功跳转到下个动作 -->
+                        <unconditional-result old-status="Finished" status="BAT407" step="70" />
+                    </results>                    <!-- 输出本次动作执行的结果 -->
+                    <post-functions>
+                        <function type="class">
+                            <arg name="class.name">com.cherry.cm.core.CherryFlowResultLog</arg>
+                        </function>
+                    </post-functions>
+                </action>
+            </actions>
+        </step>
+        <step id="70" name="同步员工手机号校验标识">
+            <actions>
+                <action id="72" name="同步员工手机号校验标识">
+                    <restrict-to>
+                        <conditions type="AND">
+                            <condition type="class">
+                                <arg name="status">BAT407</arg>
+                                <arg name="class.name">com.opensymphony.workflow.util.StatusCondition</arg>
+                            </condition>
+                        </conditions>
+                    </restrict-to>
+                    <pre-functions>
+                        <function type="spring">
+                            <arg name="bean.name">binBAT407_FN</arg>
+                        </function>
+                    </pre-functions>
+                    <results>                        <!-- 导入出错时停留在本步骤 -->
+                        <result old-status="Finished" status="ErrEnded" step="70">
+                            <conditions type="AND">
+                                <condition type="class">
+                                    <arg name="class.name">com.cherry.cm.core.CherryResultCondition</arg>
+                                    <arg name="Cherry_status">-1</arg>
+                                </condition>
+                            </conditions>
+                        </result>                        <!-- 执行成功跳转到下个动作 -->
+                        <unconditional-result old-status="Finished" status="Queued" step="70" />
+                    </results>                    <!-- 输出本次动作执行的结果 -->
+                    <post-functions>
+                        <function type="class">
+                            <arg name="class.name">com.cherry.cm.core.CherryFlowResultLog</arg>
+                        </function>
+                    </post-functions>
+                </action>
+                <action id="41" name="促销产品下发处理">
+                    <restrict-to>
+                        <conditions type="AND">
+                            <condition type="class">
+                                <arg name="status">Queued</arg>
+                                <arg name="class.name">com.opensymphony.workflow.util.StatusCondition</arg>
+                            </condition>
+                        </conditions>
+                    </restrict-to>
+                    <pre-functions>
+                        <function type="spring">
+                            <arg name="bean.name">binbessprm07_FN</arg>
+                        </function>
+                    </pre-functions>
+                    <results>                        <!-- 导入出错时停留在本步骤 -->
+                        <result old-status="Finished" status="ErrEnded" step="70">
+                            <conditions type="AND">
+                                <condition type="class">
+                                    <arg name="class.name">com.cherry.cm.core.CherryResultCondition</arg>
+                                    <arg name="Cherry_status">-1</arg>
+                                </condition>
+                            </conditions>
+                        </result>                        <!-- 执行成功跳转到下个动作 -->
+                        <unconditional-result old-status="Finished" status="Underway" step="70"/>
+                    </results>                    <!-- 输出本次动作执行的结果 -->
+                    <post-functions>
+                        <function type="class">
+                            <arg name="class.name">com.cherry.cm.core.CherryFlowResultLog</arg>
+                        </function>
+                    </post-functions>
+                </action>
+                <action id="42" name="促销活动下发处理">
+                    <restrict-to>
+                        <conditions type="AND">
+                            <condition type="class">
+                                <arg name="status">Underway</arg>
+                                <arg name="class.name">com.opensymphony.workflow.util.StatusCondition</arg>
+                            </condition>
+                        </conditions>
+                    </restrict-to>
+                    <pre-functions>
+                        <function type="spring">
+                            <arg name="bean.name">binOLCM09_FN</arg>
+                        </function>
+                    </pre-functions>
+                    <results>                        <!-- 导入出错时停留在本步骤 -->
+                        <result old-status="Finished" status="ErrEnded" step="70">
+                            <conditions type="AND">
+                                <condition type="class">
+                                    <arg name="class.name">com.cherry.cm.core.CherryResultCondition</arg>
+                                    <arg name="Cherry_status">-1</arg>
+                                </condition>
+                            </conditions>
+                        </result>                        <!-- 执行成功跳转到下个动作 -->
+                        <unconditional-result old-status="Finished" status="ACTQueued451" step="70"/>
+                    </results>                    <!-- 输出本次动作执行的结果 -->
+                    <post-functions>
+                        <function type="class">
+                            <arg name="class.name">com.cherry.cm.core.CherryFlowResultLog</arg>
+                        </function>
+                    </post-functions>
+                </action>
+                <action id="45" name="会员活动下发处理">
+                    <restrict-to>
+                        <conditions type="AND">
+                            <condition type="class">
+                                <arg name="status">ACTQueued451</arg>
+                                <arg name="class.name">com.opensymphony.workflow.util.StatusCondition</arg>
+                            </condition>
+                        </conditions>
+                    </restrict-to>
+                    <pre-functions>
+                        <function type="spring">
+                            <arg name="bean.name">binCPMEACT01_FN</arg>
+                        </function>
+                    </pre-functions>
+                    <results>                        <!-- 导入出错时停留在本步骤 -->
+                        <result old-status="Finished" status="ErrEnded" step="70">
+                            <conditions type="AND">
+                                <condition type="class">
+                                    <arg name="class.name">com.cherry.cm.core.CherryResultCondition</arg>
+                                    <arg name="Cherry_status">-1</arg>
+                                </condition>
+                            </conditions>
+                        </result>                        <!-- 执行成功跳转到下个动作 -->
+                        <unconditional-result old-status="Finished" status="TICQueued" step="70"/>
+                    </results>                    <!-- 输出本次动作执行的结果 -->
+                    <post-functions>
+                        <function type="class">
+                            <arg name="class.name">com.cherry.cm.core.CherryFlowResultLog</arg>
+                        </function>
+                    </post-functions>
+                </action>
+                <action id="47" name="活动预约单据下发处理">
+                    <restrict-to>
+                        <conditions type="AND">
+                            <condition type="class">
+                                <arg name="status">TICQueued</arg>
+                                <arg name="class.name">com.opensymphony.workflow.util.StatusCondition</arg>
+                            </condition>
+                        </conditions>
+                    </restrict-to>
+                    <pre-functions>
+                        <function type="spring">
+                            <arg name="bean.name">binCPMEACT02_FN</arg>
+                        </function>
+                    </pre-functions>
+                    <results>                        <!-- 导入出错时停留在本步骤 -->
+                        <result old-status="Finished" status="ErrEnded" step="70">
+                            <conditions type="AND">
+                                <condition type="class">
+                                    <arg name="class.name">com.cherry.cm.core.CherryResultCondition</arg>
+                                    <arg name="Cherry_status">-1</arg>
+                                </condition>
+                            </conditions>
+                        </result>                        <!-- 执行成功跳转到下个动作 -->
+                        <unconditional-result old-status="Finished" status="BAT342" step="91"/>
+                    </results>                    <!-- 输出本次动作执行的结果 -->
+                    <post-functions>
+                        <function type="class">
+                            <arg name="class.name">com.cherry.cm.core.CherryFlowResultLog</arg>
+                        </function>
+                    </post-functions>
+                </action>
+            </actions>
+        </step>
+        <step id="91" name="促销标签预处理">
+            <actions>
+                <action id="914" name="促销标签预处理">
+                    <restrict-to>
+                        <conditions type="AND">
+                            <condition type="class">
+                                <arg name="status">BAT342</arg>
+                                <arg name="class.name">com.opensymphony.workflow.util.StatusCondition</arg>
+                            </condition>
+                        </conditions>
+                    </restrict-to>
+                    <pre-functions>
+                        <function type="spring">
+                            <arg name="bean.name">binBAT342_FN</arg>
+                        </function>
+                    </pre-functions>
+                    <results>                        <!-- 导入出错时停留在本步骤 -->
+                        <result old-status="Finished" status="ErrEnded" step="91">
+                            <conditions type="AND">
+                                <condition type="class">
+                                    <arg name="class.name">com.cherry.cm.core.CherryResultCondition</arg>
+                                    <arg name="Cherry_status">-1</arg>
+                                </condition>
+                            </conditions>
+                        </result>                        <!-- 执行成功跳转到下个动作 -->
+                        <unconditional-result old-status="Finished" status="BAT426" step="91"/>
+                    </results>                    <!-- 输出本次动作执行的结果 -->
+                    <post-functions>
+                        <function type="class">
+                            <arg name="class.name">com.cherry.cm.core.CherryFlowResultLog</arg>
+                        </function>
+                    </post-functions>
+                </action>
+                <action id="915" name="促销活动地点范围矫正">
+                    <restrict-to>
+                        <conditions type="AND">
+                            <condition type="class">
+                                <arg name="status">BAT426</arg>
+                                <arg name="class.name">com.opensymphony.workflow.util.StatusCondition</arg>
+                            </condition>
+                        </conditions>
+                    </restrict-to>
+                    <pre-functions>
+                        <function type="spring">
+                            <arg name="bean.name">binCPMEACT10_FN</arg>
+                        </function>
+                    </pre-functions>
+                    <results>                        <!-- 导入出错时停留在本步骤 -->
+                        <result old-status="Finished" status="ErrEnded" step="91">
+                            <conditions type="AND">
+                                <condition type="class">
+                                    <arg name="class.name">com.cherry.cm.core.CherryResultCondition</arg>
+                                    <arg name="Cherry_status">-1</arg>
+                                </condition>
+                            </conditions>
+                        </result>                        <!-- 执行成功跳转到下个动作 -->
+                        <unconditional-result old-status="Finished" status="FinishCherry" step="900"/>
+                    </results>                    <!-- 输出本次动作执行的结果 -->
+                    <post-functions>
+                        <function type="class">
+                            <arg name="class.name">com.cherry.cm.core.CherryFlowResultLog</arg>
+                        </function>
+                    </post-functions>
+                </action>
+            </actions>
+        </step>
+        <step id="900" name="定时JOB工作流程结束处理">
+            <actions>
+                <action id="901" name="结束定时JOB工作流程">
+                    <restrict-to>
+                        <conditions type="AND">
+                            <condition type="class">
+                                <arg name="status">FinishCherry</arg>
+                                <arg name="class.name">com.opensymphony.workflow.util.StatusCondition</arg>
+                            </condition>
+                        </conditions>
+                    </restrict-to>
+                    <pre-functions>
+                        <function type="beanshell">
+                            <arg name="script"><![CDATA[               batchDate = new Date();                        transientVars.get("logger").info("###########################更新业务日期处理JOB于"+batchDate+"结束处理#####################################");      ]]></arg>
+                        </function>
+                    </pre-functions>
+                    <results>
+                        <unconditional-result old-status="Finished" status="Finished" step="999" />
+                    </results>
+                </action>
+            </actions>
+        </step>
+        <step id="999" name="流程结束"></step>
+    </steps>
+</workflow>
