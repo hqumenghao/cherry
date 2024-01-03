@@ -916,76 +916,6 @@
                         </result>
                         <!-- 执行成功跳转到下个动作 -->
                         <unconditional-result old-status="Finished"
-                                              status="VCRQueued" step="40" />
-                    </results>
-                    <!-- 输出本次动作执行的结果 -->
-                    <post-functions>
-                        <function type="class">
-                            <arg name="class.name">com.cherry.cm.core.CherryFlowResultLog</arg>
-                        </function>
-                    </post-functions>
-                </action>
-                <action id="40" name="会员回访任务生成处理">
-                    <restrict-to>
-                        <conditions type="AND">
-                            <condition type="class">
-                                <arg name="status">VCRQueued</arg>
-                                <arg name="class.name">com.opensymphony.workflow.util.StatusCondition</arg>
-                            </condition>
-                        </conditions>
-                    </restrict-to>
-                    <pre-functions>
-                        <function type="spring">
-                            <arg name="bean.name">binBEMBVIS04_FN</arg>
-                        </function>
-                    </pre-functions>
-                    <results>
-                        <!-- 导入出错时停留在本步骤 -->
-                        <result old-status="Finished" status="ErrEnded" step="40">
-                            <conditions type="AND">
-                                <condition type="class">
-                                    <arg name="class.name">com.cherry.cm.core.CherryResultCondition</arg>
-                                    <arg name="Cherry_status">-1</arg>
-                                </condition>
-                            </conditions>
-                        </result>
-                        <!-- 执行成功跳转到下个动作 -->
-                        <unconditional-result old-status="Finished"
-                                              status="VTBQueued" step="40" />
-                    </results>
-                    <!-- 输出本次动作执行的结果 -->
-                    <post-functions>
-                        <function type="class">
-                            <arg name="class.name">com.cherry.cm.core.CherryFlowResultLog</arg>
-                        </function>
-                    </post-functions>
-                </action>
-                <action id="49" name="会员回访任务同步处理">
-                    <restrict-to>
-                        <conditions type="AND">
-                            <condition type="class">
-                                <arg name="status">VTBQueued</arg>
-                                <arg name="class.name">com.opensymphony.workflow.util.StatusCondition</arg>
-                            </condition>
-                        </conditions>
-                    </restrict-to>
-                    <pre-functions>
-                        <function type="spring">
-                            <arg name="bean.name">binBEMBVIS03_FN</arg>
-                        </function>
-                    </pre-functions>
-                    <results>
-                        <!-- 导入出错时停留在本步骤 -->
-                        <result old-status="Finished" status="ErrEnded" step="40">
-                            <conditions type="AND">
-                                <condition type="class">
-                                    <arg name="class.name">com.cherry.cm.core.CherryResultCondition</arg>
-                                    <arg name="Cherry_status">-1</arg>
-                                </condition>
-                            </conditions>
-                        </result>
-                        <!-- 执行成功跳转到下个动作 -->
-                        <unconditional-result old-status="Finished"
                                               status="Underway" step="50" />
                     </results>
                     <!-- 输出本次动作执行的结果 -->
@@ -1050,6 +980,76 @@
                     <pre-functions>
                         <function type="spring">
                             <arg name="bean.name">binBETLBAT04_FN</arg>
+                        </function>
+                    </pre-functions>
+                    <results>
+                        <!-- 导入出错时停留在本步骤 -->
+                        <result old-status="Finished" status="ErrEnded" step="60">
+                            <conditions type="AND">
+                                <condition type="class">
+                                    <arg name="class.name">com.cherry.cm.core.CherryResultCondition</arg>
+                                    <arg name="Cherry_status">-1</arg>
+                                </condition>
+                            </conditions>
+                        </result>
+                        <!-- 执行成功跳转到下个动作 -->
+                        <unconditional-result old-status="Finished"
+                                              status="VCRQueued" step="60" />
+                    </results>
+                    <!-- 输出本次动作执行的结果 -->
+                    <post-functions>
+                        <function type="class">
+                            <arg name="class.name">com.cherry.cm.core.CherryFlowResultLog</arg>
+                        </function>
+                    </post-functions>
+                </action>
+                <action id="601" name="会员回访任务生成处理">
+                    <restrict-to>
+                        <conditions type="AND">
+                            <condition type="class">
+                                <arg name="status">VCRQueued</arg>
+                                <arg name="class.name">com.opensymphony.workflow.util.StatusCondition</arg>
+                            </condition>
+                        </conditions>
+                    </restrict-to>
+                    <pre-functions>
+                        <function type="spring">
+                            <arg name="bean.name">binBEMBVIS04_FN</arg>
+                        </function>
+                    </pre-functions>
+                    <results>
+                        <!-- 导入出错时停留在本步骤 -->
+                        <result old-status="Finished" status="ErrEnded" step="60">
+                            <conditions type="AND">
+                                <condition type="class">
+                                    <arg name="class.name">com.cherry.cm.core.CherryResultCondition</arg>
+                                    <arg name="Cherry_status">-1</arg>
+                                </condition>
+                            </conditions>
+                        </result>
+                        <!-- 执行成功跳转到下个动作 -->
+                        <unconditional-result old-status="Finished"
+                                              status="VTBQueued" step="60" />
+                    </results>
+                    <!-- 输出本次动作执行的结果 -->
+                    <post-functions>
+                        <function type="class">
+                            <arg name="class.name">com.cherry.cm.core.CherryFlowResultLog</arg>
+                        </function>
+                    </post-functions>
+                </action>
+                <action id="602" name="会员回访任务同步处理">
+                    <restrict-to>
+                        <conditions type="AND">
+                            <condition type="class">
+                                <arg name="status">VTBQueued</arg>
+                                <arg name="class.name">com.opensymphony.workflow.util.StatusCondition</arg>
+                            </condition>
+                        </conditions>
+                    </restrict-to>
+                    <pre-functions>
+                        <function type="spring">
+                            <arg name="bean.name">binBEMBVIS03_FN</arg>
                         </function>
                     </pre-functions>
                     <results>
