@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE workflow PUBLIC "-//OpenSymphony Group//DTD OSWorkflow 2.8//EN" "http://www.opensymphony.com/osworkflow/workflow_2_8.dtd">
+<workflow>
+	<registers>
+		<register type="class" variable-name="logger">
+			<arg name="class.name">com.cherry.cm.core.CherryFlowLogRegister</arg>
+			<arg name="addInstanceId">true</arg>
+		</register>
+	</registers>
+	<initial-actions>
+		<action id="1000" name="开始">
+			<pre-functions>
+				<function type="beanshell">
+					<arg name="script">
+				<![CDATA[
+				         batchDate = new Date();
+	                     transientVars.get("logger").info("###########################0 0/5 * * * ?颖通订货退库业务数据导入导出JOB于"+batchDate+"开始处理#####################################");
+				]]>
+					</arg>
+				</function>
+				<function type="class">
+					<arg name="class.name">com.opensymphony.workflow.util.Caller</arg>
+				</function>
+			</pre-functions>
+			<results>
+				<unconditional-result old-status="Finished" status="BAT179" step="100" owner="${caller}" />
+			</results>
+		</action>
+	</initial-actions>
+	<steps>
+		<step id="100" name="会员通数据处理STEP">
+			<actions>
+			    <!-- ********* 获取会员通销售（退款）数据（会员通） ******* -->
+				<action id="101" name="获取会员通销售（退款）数据（会员通）">
+					<restrict-to>
+						<conditions type="AND">
+							<condition type="class">
+								<arg name="status">BAT179</arg>
+								<arg name="class.name">com.opensymphony.workflow.util.StatusCondition</arg>
+							</condition>
+						</conditions>
+					</restrict-to>
+					<pre-functions>
+						<function type="spring"><arg name="bean.name">binBAT179_FN</arg>
+						</function>
+					</pre-functions>
+					<results>
+						<!-- 导入出错时停留在本步骤 -->
+						<result old-status="Finished" status="ErrEnded" step="100">
+							<conditions type="AND">
+								<condition type="class">
+									<arg name="class.name">com.cherry.cm.core.CherryResultCondition</arg>
+									<arg name="Cherry_status">-1</arg>
+								</condition>
+							</conditions>
+						</result>
+						<unconditional-result old-status="Finished" status="BAT180" step="100" />
+					</results>
+					<post-functions>
+						<function type="class">
+							<arg name="class.name">com.cherry.cm.core.CherryFlowResultLog</arg>
+						</function>
+					</post-functions>
+				</action>
+				 <!-- ********* 获取会员通交易异常数据处理 ******* -->
+				<action id="102" name="获取会员通交易异常数据处理">
+					<restrict-to>
+						<conditions type="AND">
+							<condition type="class">
+								<arg name="status">BAT180</arg>
+								<arg name="class.name">com.opensymphony.workflow.util.StatusCondition</arg>
+							</condition>
+						</conditions>
+					</restrict-to>
+					<pre-functions>
+						<function type="spring"><arg name="bean.name">binBAT180_FN</arg>
+						</function>
+					</pre-functions>
+					<results>
+						<!-- 导入出错时停留在本步骤 -->
+						<result old-status="Finished" status="ErrEnded" step="100">
+							<conditions type="AND">
+								<condition type="class">
+									<arg name="class.name">com.cherry.cm.core.CherryResultCondition</arg>
+									<arg name="Cherry_status">-1</arg>
+								</condition>
+							</conditions>
+						</result>
+						<unconditional-result old-status="Finished" status="FinishCherry" step="900" />
+					</results>
+					<post-functions>
+						<function type="class">
+							<arg name="class.name">com.cherry.cm.core.CherryFlowResultLog</arg>
+						</function>
+					</post-functions>
+				</action>
+			</actions>
+		</step>
+		<step id="900" name="定时JOB工作流程结束处理">
+			<actions>
+				<action id="901" name="结束定时JOB工作流程">
+					<restrict-to>
+						<conditions type="AND">
+							<condition type="class">
+								<arg name="status">FinishCherry</arg>
+								<arg name="class.name">com.opensymphony.workflow.util.StatusCondition</arg>
+							</condition>
+						</conditions>
+					</restrict-to>
+					<pre-functions>
+						<function type="beanshell">
+							<arg name="script"></arg>
+						</function>
+					</pre-functions>
+					<results>
+						<unconditional-result old-status="Finished" status="Finished" step="999" />
+					</results>
+				</action>
+			</actions>
+		</step>
+		<step id="999" name="流程结束">
+		</step>
+	</steps>
+</workflow>
